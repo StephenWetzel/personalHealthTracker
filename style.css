@@ -1,0 +1,59 @@
+.title {
+	margin-left: 5px;
+}
+
+.dashDataList {
+	margin-left: 20px;
+	max-width: 900px;
+}
+
+.dashDataLine {
+	margin-top: 20px;
+	font-size: 16px;
+}
+
+.dashDataName {
+	margin-left: 20px;
+	font-weight: 900;
+}
+
+.dashDataValue {
+	margin-left: 20px;
+}
+
+.dashDataButton {
+	margin-left: 20px;
+}
+
+.dashDataDate {
+	margin-left: 50px;
+	font-size: 10px;
+}
+
+.dashDeleteButton {
+	float:right
+}
+
+.dashAddType {
+	margin-top: 10px;
+}
+
+.oddLine {
+	background: #eef;
+}
+
+.evenLine {
+	background: #efe;
+}
+
+.oldData {
+	color: #d11;
+}
+
+.currData {
+	
+}
+
+.badValue {
+	color: #d11;
+}
