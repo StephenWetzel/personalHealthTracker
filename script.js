@@ -10,8 +10,8 @@ var twiceDaily = 60 * 60 * 12;
 var weekly = 60 * 60 * 24 * 7;
 var monthly = 60 * 60 * 24 * 30;
 
-
-var testUserData = [
+//user data for testing/demos
+var testUserData = [ 
 {"type":"Blood Pressure (diastolic)","data":[{"date":1457277331940,"value":78},{"date":1457297330949,"value":83},{"date":1457426304867,"value":88},{"date":1457486504867,"value":95}]},
 {"type":"Blood Pressure (systolic)","data":[{"date":1457277231840,"value":119},{"date":1457297230849,"value":108},{"date":1457426304867,"value":138},{"date":1457486507867,"value":131}]},
 {"type":"Cholesterol (Total)","data":[{"date":1457297231840,"value":197},{"date":1457297230849,"value":203},{"date":1457426304867,"value":215},{"date":1457486507867,"value":192}]},
@@ -21,6 +21,7 @@ var defaultUserInfo = {name: '', height: 0, sex: ''};
 var userData = [];
 var userInfo = defaultUserInfo;
 
+//these are the types of stats that can be tracked
 var datatypes = [
 	{type: "Fasting Blood Sugar", max: 100, min: 70, logFreq: daily, unit: "mg/dL"}, 
 	{type: "Heart Rate", max: 100, min: 60, logFreq: daily, unit: "BPM"},
@@ -58,7 +59,7 @@ function zeroPad(num)
 	return num;
 }
 
-function formatTime(timestamp)
+function formatTime(timestamp) //takes a unix timestamp
 {//Output format: 10:01:51 PM
 	var date = new Date(timestamp);
 	output = "";
@@ -81,8 +82,7 @@ function formatTime(timestamp)
 	return output;
 }
 
-//get a date object and return a formatted string, the format is hardcoded
-function formatDate(timestamp)
+function formatDate(timestamp) //takes a unix timestamp
 {//Output format: 2016-02-29
 	var date = new Date(timestamp);
 	output = "";
@@ -92,7 +92,8 @@ function formatDate(timestamp)
 	return output;
 }
 
-function convertSecsToDays(secs) {
+function convertSecsToDays(secs) 
+{//takes a number of seconds and returns a string telling how many hours/mins/days/etc ago that was
 	output = '';
 	if (secs > monthly) {
 		output = roundTo(secs / monthly) + " months ago";
@@ -111,7 +112,7 @@ function convertSecsToDays(secs) {
 }
 
 function getDataSeries(typeName)
-{
+{//take a stat name, and return the user's data series for it
 	var dataSeries = null;
 	userData.forEach(function(item, ii) {
 		if (item.type == typeName)
@@ -123,12 +124,12 @@ function getDataSeries(typeName)
 }
 
 function isCurrTracked(typeName)
-{
+{//true if this stat is currently tracked
 	return (getDataSeries(typeName) != null);
 }
 
 function getNewestPoint(thisSeries)
-{
+{//return the newest point in a given data series
 	var newestDate = 0;
 	var newestValue = 0;
 	thisSeries.data.forEach(function(item, ii) {
@@ -141,7 +142,7 @@ function getNewestPoint(thisSeries)
 }
 
 function getDataAge(thisSeries)
-{
+{//gets the age of data, and returns a span tag with proper style
 	var output = '';
 	var freq = 0;
 	datatypes.forEach(function(item, ii) {
@@ -163,9 +164,8 @@ function getDataAge(thisSeries)
 }
 
 function AddDataType()
-{
+{//user chooses to track a new type of stat
 	var newType = document.getElementById("DataTypeSelect").value
-	//{"type":"Blood Pressure (diastolic)","data":[]}
 	if ( !isCurrTracked(newType) ) {
 		userData.push({type: newType, data: []});
 		PromptForData(newType);
@@ -177,7 +177,7 @@ function AddDataType()
 }
 
 function AddData(typeName, value)
-{
+{//store a data point in this data series
 	userData.forEach(function(item, ii) {
 		if (item.type == typeName)
 		{
@@ -188,7 +188,7 @@ function AddData(typeName, value)
 }
 
 function getHealthyLimits(typeName)
-{
+{//returns an array of the [min, max] healthy limits for a given stat
 	var max = 0;
 	var min = 0;
 	datatypes.forEach(function(item, ii) {
@@ -202,7 +202,7 @@ function getHealthyLimits(typeName)
 }
 
 function checkDataPoint(typeName, value)
-{
+{//check to see if a given value is below (-1) inside (0) or above(1) the healthy range
 	//This can be updated to destructuring assignment when it is better supported
 	var temp = getHealthyLimits(typeName);
 	var min = temp[0]; var max = temp[1];
@@ -215,7 +215,7 @@ function checkDataPoint(typeName, value)
 }
 
 function PromptForData(typeName)
-{
+{//ask the user for a value for this type of data, store it, and refresh page
 	var input = '';
 	while (!isNumeric(input)) {	
 		input = prompt("Enter New " + typeName, '');
@@ -229,7 +229,7 @@ function PromptForData(typeName)
 }
 
 function DeleteData(typeName)
-{
+{//delete a data type
 	userData.forEach(function(item, ii) {
 		if (item.type == typeName)
 		{
@@ -245,7 +245,7 @@ function isNumeric(n) {
 }
 
 function getUnit(thisSeries) 
-{
+{//get the units (eg mg/dL) for a given data series
 	var unit = '';
 	datatypes.forEach(function(item, ii) {
 		if (item.type == thisSeries.type) 
@@ -257,13 +257,13 @@ function getUnit(thisSeries)
 }
 
 function getUnitFromName(typeName)
-{
+{//wrapper for getUnits, if we instead have the data type name
 	thisSeries = getDataSeries(typeName);
 	return getUnit(thisSeries);
 }
 
 function BuildHomePage()
-{
+{//create the main stats container
 	var output = '';
 	var style = "oddLine";
 	
@@ -305,11 +305,7 @@ function BuildHomePage()
 		output += "<option value='"+item.type+"'>"+item.type+"</option>";
 	});
 	output += "</select>  <input type='submit' value='Track a New Type' onclick='AddDataType()'></div>";
-	
-	//confirm delete
-	//view report at bottom of page
-	//something with bmi
-	
+		
 	document.getElementById('container').innerHTML = output;
 	if (userInfo.name != '') {
 		document.getElementById('userNameSpan').innerHTML = userInfo.name+"'s ";
@@ -317,7 +313,7 @@ function BuildHomePage()
 }
 
 function ResetDefaultData()
-{
+{//reset everything to default (testing) data
 	userData = testUserData;
 	userInfo = defaultUserInfo;
 	StoreData(userData, "userData");
@@ -326,7 +322,7 @@ function ResetDefaultData()
 }
 
 function ClearAllData()
-{
+{//clear all the stored data
 	userData = [];
 	userInfo = defaultUserInfo;
 	StoreData(userData, "userData");
@@ -335,7 +331,7 @@ function ClearAllData()
 }
 
 function addUserInfo()
-{
+{//ask user for their unchanging info (name, etc)
 	var input = '';
 	input = prompt("Enter Your Name ", '');
 	userInfo.name = input;
@@ -354,7 +350,7 @@ function addUserInfo()
 }
 
 function GenReport(typeName)
-{
+{//build the table for a given stat and put it on the bottom of the page
 	var unit = getUnitFromName(typeName);
 	var thisSeries = getDataSeries(typeName);
 	var output = '';
@@ -379,6 +375,6 @@ function GenReport(typeName)
 }
 
 function clearReport()
-{
+{//delete the shown report
 	document.getElementById('reportArea').innerHTML = '';
 }
