@@ -12,8 +12,8 @@ var monthly = 60 * 60 * 24 * 30;
 
 
 testUserData = [
-{"type":"Blood Pressure (diastolic)","data":[{"date":1457297331940,"value":78},{"date":1457297330949,"value":83}]},
-{"type":"Blood Pressure (systolic)","data":[{"date":1457297231840,"value":119},{"date":1457297230849,"value":108}]},
+{"type":"Blood Pressure (diastolic)","data":[{"date":1457297331940,"value":78},{"date":1457297330949,"value":83},{"date":1457486304867,"value":88}]},
+{"type":"Blood Pressure (systolic)","data":[{"date":1457297231840,"value":119},{"date":1457297230849,"value":108},{"date":1457486304867,"value":138}]},
 {"type":"Heart Rate","data":[{"date":1457177231912,"value":72},{"date":1457187131929,"value":66}]}]
 
 userData = []
@@ -269,9 +269,33 @@ function BuildHomePage()
 	});
 	output += "</select>  <input type='submit' value='Track a New Type' onclick='AddDataType()'></div>";
 	
-	
+	//confirm delete
+	//view report at bottom of page
+	//something with bmi
+	//ask user for unchanging stats: height, sex, name
 	//clear all button
 	//result to default data button
 	
 	document.getElementById('container').innerHTML = output;
+}
+
+function ResetDefaultData()
+{
+	console.log("Reset Data");
+	userData = testUserData;
+	StoreData(userData);
+	BuildHomePage();
+}
+
+function ClearAllData()
+{
+	console.log("Clear Data");
+	userData = [];
+	StoreData(userData);
+	BuildHomePage();
+}
+
+function addUserInfo()
+{
+	console.log("User Data");
 }

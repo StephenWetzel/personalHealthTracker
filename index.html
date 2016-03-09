@@ -18,7 +18,12 @@
 	
 </head>
 <body>
-	<h1 class="title">Personal Fitness Tracker</h1>
+	<div id="header">
+		<span class="title">Personal Fitness Tracker</span>
+		<span class="userInfo" onClick="addUserInfo()">Add User Info</span>
+		
+	</div>
+	
 	<div class="dashDataList" id="container"></div>
 	
 	
@@ -26,6 +31,12 @@
 	
 	<script type="text/javascript" src="script.js"></script>
 	<script type="text/javascript">BuildHomePage()</script>
+	
+	<div id="footer">
+		<input type="submit" onclick="ResetDefaultData()" value="Reset Data to Defaults">
+		&nbsp;&nbsp;&nbsp;
+		<input type="submit" onclick="ClearAllData()" value="Clear All Data">
+	</div>
 </body>
 </html>
 
