@@ -58,13 +58,10 @@ function zeroPad(num)
 	return num;
 }
 
-//get a date object and return a formatted string, the format is hardcoded
-function formatDate(date)
-{//Output: 2/13/2001, 12:01:02 AM
+function formatTime(timestamp)
+{//Output format: 10:01:51 PM
+	var date = new Date(timestamp);
 	output = "";
-	output += (date.getMonth() + 1) + "/";
-	output += date.getDate() + "/";
-	output += date.getFullYear() + ", ";
 	if (date.getHours() > 12) {
 		output += date.getHours() - 12 + ":";
 		amPm = "PM";
@@ -81,6 +78,17 @@ function formatDate(date)
 	output += zeroPad(date.getMinutes()) + ":";
 	output += zeroPad(date.getSeconds()) + " ";
 	output += amPm;
+	return output;
+}
+
+//get a date object and return a formatted string, the format is hardcoded
+function formatDate(timestamp)
+{//Output format: 2016-02-29
+	var date = new Date(timestamp);
+	output = "";
+	output += date.getFullYear() + "-";
+	output += zeroPad(date.getMonth() + 1) + "-";
+	output += zeroPad(date.getDate()) + "";
 	return output;
 }
 
@@ -332,12 +340,14 @@ function GenReport(typeName)
 	var unit = getUnitFromName(typeName);
 	var thisSeries = getDataSeries(typeName);
 	var output = '';
-	output += "<table><thead><tr>";
+	output += "<table class='table table-striped'><thead><tr>";
 	output += "<th>Date</th><th>Time</th><th>Value ("+unit+")</th>";
-	output += "</tr>";
+	output += "</tr></thead><tbody>";
 	
 	thisSeries.data.forEach(function(item, ii) {
-		
+		output += "<tr><td>"+formatDate(item.date)+"</td>";
+		output += "<td>"+formatTime(item.date)+"</td>";
+		output += "<td>"+item.value+"</td></tr>";
 		
 	});
 	document.getElementById('reportArea').innerHTML = output;
