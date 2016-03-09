@@ -6,11 +6,25 @@
 .userInfo {
 	margin-right: 5px;
 	float: right;
+}
+
+.fakeLink {
+	text-decoration: none;
+	cursor: pointer;
+	color: #44d;
+}
+.fakeLink:hover {
 	text-decoration: underline;
-	cursor: pointer; 
+	cursor: pointer;
+	color: #66e;
 }
 
 .dashDataList {
+	margin-left: 20px;
+	max-width: 900px;
+}
+
+.dashReportArea {
 	margin-left: 20px;
 	max-width: 900px;
 }
@@ -39,7 +53,12 @@
 }
 
 .dashDeleteButton {
-	float:right
+	float:right;
+	margin-right: 3px;
+}
+
+.dashReportButton {
+	margin-left: 20px;
 }
 
 .dashAddType {

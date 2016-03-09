@@ -255,9 +255,11 @@ function BuildHomePage()
 		output += "<span class='dashDataName'>";
 		output += item.type + "</span>";
 		output += "<span class='dashDataValue "+condClass+"'>Current Value: "+newestPoint.value+" "+unit+"</span>";
-		output += "<span class='dashDataButton'><input type='submit' value='Add Data' onclick='PromptForData(\""+item.type+"\")'></span>"
+		output += "<span class='dashDataButton fakeLink' onclick='PromptForData(\""+item.type+"\")'>Add Data</span>"
+
+		output += "<span class='dashReportButton fakeLink' onclick='GenReport(\""+item.type+"\")'>Report</span>"
 		output += "<span class='dashDataDate'>Last updated: " + age + "</span>";
-		output += "<span class='dashDeleteButton'><input type='submit' value='Delete Data' onclick='DeleteData(\""+item.type+"\")'></span>"
+		output += "<span class='dashDeleteButton fakeLink' onclick='DeleteData(\""+item.type+"\")'>Delete</span>"
 		
 		output += "</div>";
 		if (style == "oddLine") { style = "evenLine"; }
@@ -313,4 +315,12 @@ function addUserInfo()
 	//}
 	//userInfo.height = input;
 	StoreData(userInfo, "userInfo");
+}
+
+function GenReport(type)
+{
+	type.data.forEach(function(item, ii) {
+		
+		
+	});
 }
