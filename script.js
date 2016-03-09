@@ -84,19 +84,6 @@ function formatDate(date)
 	return output;
 }
 
-function getNewestPoint(thisSeries)
-{
-	var newestDate = 0;
-	var newestValue = 0;
-	thisSeries.data.forEach(function(item, ii) {
-		if (item.date > newestDate) {
-			newestDate = item.date;
-			newestValue = item.value;
-		}
-	});
-	return {date: newestDate, value: newestValue}
-}
-
 function convertSecsToDays(secs) {
 	output = '';
 	if (secs > monthly) {
@@ -112,19 +99,37 @@ function convertSecsToDays(secs) {
 	} else {
 		output = roundTo(secs) + " seconds ago";
 	}
-	
 	return output;
+}
+
+function getDataSeries(typeName)
+{
+	var dataSeries = null;
+	userData.forEach(function(item, ii) {
+		if (item.type == typeName)
+		{
+			dataSeries = item;
+		}
+	});
+	return dataSeries;
 }
 
 function isCurrTracked(typeName)
 {
-	var bool = false;
-	userData.forEach(function(item, ii) {
-		if (item.type == typeName) {
-			bool = true; 
+	return (getDataSeries(typeName) != null);
+}
+
+function getNewestPoint(thisSeries)
+{
+	var newestDate = 0;
+	var newestValue = 0;
+	thisSeries.data.forEach(function(item, ii) {
+		if (item.date > newestDate) {
+			newestDate = item.date;
+			newestValue = item.value;
 		}
 	});
-	return bool;
+	return {date: newestDate, value: newestValue}
 }
 
 function getDataAge(thisSeries)
@@ -222,7 +227,8 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-function getUnit(thisSeries) {
+function getUnit(thisSeries) 
+{
 	var unit = '';
 	datatypes.forEach(function(item, ii) {
 		if (item.type == thisSeries.type) 
@@ -231,6 +237,12 @@ function getUnit(thisSeries) {
 		}
 	});
 	return unit;
+}
+
+function getUnitFromName(typeName)
+{
+	thisSeries = getDataSeries(typeName);
+	return getUnit(thisSeries);
 }
 
 function BuildHomePage()
@@ -317,4 +329,16 @@ function addUserInfo()
 
 function GenReport(typeName)
 {
+	var unit = getUnitFromName(typeName);
+	var thisSeries = getDataSeries(typeName);
+	var output = '';
+	output += "<table><thead><tr>";
+	output += "<th>Date</th><th>Time</th><th>Value ("+unit+")</th>";
+	output += "</tr>";
+	
+	thisSeries.data.forEach(function(item, ii) {
+		
+		
+	});
+	document.getElementById('reportArea').innerHTML = output;
 }
