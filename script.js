@@ -84,12 +84,11 @@ function formatDate(date)
 	return output;
 }
 
-
-function getNewestPoint(data)
+function getNewestPoint(thisSeries)
 {
 	var newestDate = 0;
 	var newestValue = 0;
-	data.data.forEach(function(item, ii) {
+	thisSeries.data.forEach(function(item, ii) {
 		if (item.date > newestDate) {
 			newestDate = item.date;
 			newestValue = item.value;
@@ -99,7 +98,6 @@ function getNewestPoint(data)
 }
 
 function convertSecsToDays(secs) {
-	
 	output = '';
 	if (secs > monthly) {
 		output = roundTo(secs / monthly) + " months ago";
@@ -118,28 +116,28 @@ function convertSecsToDays(secs) {
 	return output;
 }
 
-function isCurrTracked(type)
+function isCurrTracked(typeName)
 {
 	var bool = false;
 	userData.forEach(function(item, ii) {
-		if (item.type == type) {
+		if (item.type == typeName) {
 			bool = true; 
 		}
 	});
 	return bool;
 }
 
-function getDataAge(data)
+function getDataAge(thisSeries)
 {
 	var output = '';
 	var freq = 0;
 	datatypes.forEach(function(item, ii) {
-		if (item.type == data.type) 
+		if (item.type == thisSeries.type) 
 		{
 			freq = item.logFreq;
 		}
 	});
-	var newestPoint = getNewestPoint(data);
+	var newestPoint = getNewestPoint(thisSeries);
 	
 	var now = Date.now();
 	var age = (now - newestPoint.date) / 1000;
@@ -151,7 +149,7 @@ function getDataAge(data)
 	return output;
 }
 
-function AddDataType(type)
+function AddDataType()
 {
 	var newType = document.getElementById("DataTypeSelect").value
 	//{"type":"Blood Pressure (diastolic)","data":[]}
@@ -165,53 +163,53 @@ function AddDataType(type)
 	BuildHomePage();
 }
 
-function AddData(type, data)
+function AddData(typeName, value)
 {
 	userData.forEach(function(item, ii) {
-		if (item.type == type)
+		if (item.type == typeName)
 		{
-			item.data.push({date: Date.now(), value: data});
+			item.data.push({date: Date.now(), value: value});
 		}
 	});
 	StoreData(userData, "userData");
 }
 
-function checkDataPoint(type, data)
+function checkDataPoint(typeName, value)
 {
 	datatypes.forEach(function(item, ii) {
-		if (item.type == type) 
+		if (item.type == typeName) 
 		{
 			max = item.max;
 			min = item.min;
 		}
 	});
 	
-	if (data > max) {
+	if (value > max) {
 		return 1;
-	} else if (data < min) {
+	} else if (value < min) {
 		return -1;
 	}
 	return 0;
 }
 
-function PromptForData(type)
+function PromptForData(typeName)
 {
 	var input = '';
 	while (!isNumeric(input)) {	
-		input = prompt("Enter New " + type, '');
+		input = prompt("Enter New " + typeName, '');
 	}
-	AddData(type, input);
-	var ok = checkDataPoint(type, input);
+	AddData(typeName, input);
+	var ok = checkDataPoint(typeName, input);
 	if (ok == 1) { alert ("Warning! Too high!"); }
 	else if (ok == -1) { alert ("Warning! Too low!"); }
 	else { /*ok value*/ }
 	BuildHomePage();
 }
 
-function DeleteData(type)
+function DeleteData(typeName)
 {
 	userData.forEach(function(item, ii) {
-		if (item.type == type)
+		if (item.type == typeName)
 		{
 			userData.pop(ii);
 		}
@@ -224,10 +222,10 @@ function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-function getUnit(data) {
+function getUnit(thisSeries) {
 	var unit = '';
 	datatypes.forEach(function(item, ii) {
-		if (item.type == data.type) 
+		if (item.type == thisSeries.type) 
 		{
 			unit = item.unit;
 		}
@@ -236,7 +234,7 @@ function getUnit(data) {
 }
 
 function BuildHomePage()
-{	
+{
 	var output = '';
 	var style = "oddLine";
 	
@@ -317,10 +315,6 @@ function addUserInfo()
 	StoreData(userInfo, "userInfo");
 }
 
-function GenReport(type)
+function GenReport(typeName)
 {
-	type.data.forEach(function(item, ii) {
-		
-		
-	});
 }
