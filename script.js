@@ -14,9 +14,11 @@ var monthly = 60 * 60 * 24 * 30;
 testUserData = [
 {"type":"Blood Pressure (diastolic)","data":[{"date":1457297331940,"value":78},{"date":1457297330949,"value":83},{"date":1457486304867,"value":88}]},
 {"type":"Blood Pressure (systolic)","data":[{"date":1457297231840,"value":119},{"date":1457297230849,"value":108},{"date":1457486304867,"value":138}]},
-{"type":"Heart Rate","data":[{"date":1457177231912,"value":72},{"date":1457187131929,"value":66}]}]
+{"type":"Heart Rate","data":[{"date":1457177231912,"value":72},{"date":1457187131929,"value":66}]}];
 
-userData = []
+userData = [];
+
+userInfo = {name: '', height: 0, sex: ''};
 
 datatypes = [
 	{type: "Fasting Blood Sugar", max: 100, min: 70, logFreq: daily, unit: "mg/dL"}, 
@@ -26,17 +28,17 @@ datatypes = [
 	{type: "Cholesterol (HDL)", max: 200, min: 50, logFreq: daily, unit: "mg/dL"},
 	{type: "Triglycerides", max: 150, min: 10, logFreq: daily, unit: "mg/dL"},
 	{type: "Blood Pressure (diastolic)", max: 90, min: 60, logFreq: daily, unit: "mm Hg"},
-	{type: "Blood Pressure (systolic)", max: 120, min: 80, logFreq: daily, unit: "mm Hg"}]
+	{type: "Blood Pressure (systolic)", max: 120, min: 80, logFreq: daily, unit: "mm Hg"}];
 
 
-function StoreData(obj)
-{//take a js obj and store it a string in localStorage
-	localStorage.setItem("userData", JSON.stringify(obj));
+function StoreData(obj, name)
+{//take a js obj and store it as a string in localStorage
+	localStorage.setItem(name, JSON.stringify(obj));
 }
 
-function ReadData()
+function ReadData(name)
 {//retrieve string from localStorage, and parse it as obj
-	var data = localStorage.userData;
+	var data = localStorage[name];
 	if (data === undefined) { return testUserData; }
 	else { return JSON.parse(data); }
 	//return JSON.parse(localStorage.userData);
@@ -159,7 +161,7 @@ function AddDataType(type)
 	} else {
 		
 	}
-	StoreData(userData);
+	StoreData(userData, "userData");
 	BuildHomePage();
 }
 
@@ -171,7 +173,7 @@ function AddData(type, data)
 			item.data.push({date: Date.now(), value: data});
 		}
 	});
-	StoreData(userData);
+	StoreData(userData, "userData");
 }
 
 function checkDataPoint(type, data)
@@ -214,7 +216,7 @@ function DeleteData(type)
 			userData.pop(ii);
 		}
 	});
-	StoreData(userData);
+	StoreData(userData, "userData");
 	BuildHomePage();
 }
 
@@ -238,7 +240,8 @@ function BuildHomePage()
 	var output = '';
 	var style = "oddLine";
 	
-	userData = ReadData();
+	userInfo = ReadData("userInfo");
+	userData = ReadData("userData");
 	
 	userData.forEach(function(item, ii) {
 		var age = getDataAge(item);
@@ -259,8 +262,6 @@ function BuildHomePage()
 		output += "</div>";
 		if (style == "oddLine") { style = "evenLine"; }
 		else {style = "oddLine"; }
-		
-		
 	});
 	
 	output += "<div class='dashAddType'>Track a new type of data: <select id='DataTypeSelect'>"
@@ -272,30 +273,44 @@ function BuildHomePage()
 	//confirm delete
 	//view report at bottom of page
 	//something with bmi
-	//ask user for unchanging stats: height, sex, name
-	//clear all button
-	//result to default data button
 	
 	document.getElementById('container').innerHTML = output;
 }
 
 function ResetDefaultData()
 {
-	console.log("Reset Data");
 	userData = testUserData;
-	StoreData(userData);
+	userInfo = {name: '', height: 0, sex: ''};
+	StoreData(userData, "userData");
+	StoreData(userInfo, "userInfo");
 	BuildHomePage();
 }
 
 function ClearAllData()
 {
-	console.log("Clear Data");
 	userData = [];
-	StoreData(userData);
+	userInfo = {name: '', height: 0, sex: ''};
+	StoreData(userData, "userData");
+	StoreData(userInfo, "userInfo");
 	BuildHomePage();
 }
 
 function addUserInfo()
 {
-	console.log("User Data");
+	var input = '';
+	input = prompt("Enter Your Name ", '');
+	userInfo.name = input;
+	
+	input = '';
+	while (!isNumeric(input)) {	
+		input = prompt("Enter Your Height (inches) ", '');
+	}
+	userInfo.height = input;
+	
+	//input = '';
+	//while (!isNumeric(input)) {	
+	//	input = prompt("Enter Your Height (inches) ", '');
+	//}
+	//userInfo.height = input;
+	StoreData(userInfo, "userInfo");
 }
