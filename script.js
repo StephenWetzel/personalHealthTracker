@@ -11,17 +11,17 @@ var weekly = 60 * 60 * 24 * 7;
 var monthly = 60 * 60 * 24 * 30;
 
 
-testUserData = [
+var testUserData = [
 {"type":"Blood Pressure (diastolic)","data":[{"date":1457277331940,"value":78},{"date":1457297330949,"value":83},{"date":1457426304867,"value":88},{"date":1457486504867,"value":95}]},
 {"type":"Blood Pressure (systolic)","data":[{"date":1457277231840,"value":119},{"date":1457297230849,"value":108},{"date":1457426304867,"value":138},{"date":1457486507867,"value":131}]},
 {"type":"Cholesterol (Total)","data":[{"date":1457297231840,"value":197},{"date":1457297230849,"value":203},{"date":1457426304867,"value":215},{"date":1457486507867,"value":192}]},
 {"type":"Heart Rate","data":[{"date":1457177231912,"value":72},{"date":1457187131929,"value":66}]}];
 
-userData = [];
+var defaultUserInfo = {name: '', height: 0, sex: ''};
+var userData = [];
+var userInfo = defaultUserInfo;
 
-userInfo = {name: '', height: 0, sex: ''};
-
-datatypes = [
+var datatypes = [
 	{type: "Fasting Blood Sugar", max: 100, min: 70, logFreq: daily, unit: "mg/dL"}, 
 	{type: "Heart Rate", max: 100, min: 60, logFreq: daily, unit: "BPM"},
 	{type: "Cholesterol (Total)", max: 200, min: 70, logFreq: daily, unit: "mg/dL"},
@@ -40,9 +40,8 @@ function StoreData(obj, name)
 function ReadData(name)
 {//retrieve string from localStorage, and parse it as obj
 	var data = localStorage[name];
-	if (data === undefined) { return testUserData; }
+	if (data === undefined) { return null; }
 	else { return JSON.parse(data); }
-	//return JSON.parse(localStorage.userData);
 }
 
 function roundTo(num, digits)
@@ -204,7 +203,9 @@ function getHealthyLimits(typeName)
 
 function checkDataPoint(typeName, value)
 {
-	var [min, max] = getHealthyLimits(typeName);
+	//This can be updated to destructuring assignment when it is better supported
+	var temp = getHealthyLimits(typeName);
+	var min = temp[0]; var max = temp[1];
 	if (value > max) {
 		return 1;
 	} else if (value < min) {
@@ -269,12 +270,17 @@ function BuildHomePage()
 	userInfo = ReadData("userInfo");
 	userData = ReadData("userData");
 	
+	if (userInfo == null) { userInfo = defaultUserInfo; }
+	if (userData == null) { userData = testUserData; }
+	
+	
 	userData.forEach(function(item, ii) {
 		var age = getDataAge(item);
 		var unit = getUnit(item);
 		var newestPoint = getNewestPoint(item);
 		var name = item.type;
-		var [min, max] = getHealthyLimits(name);
+		var temp = getHealthyLimits(name);
+		var min = temp[0]; var max = temp[1];
 		var condClass = '';
 		var ok = checkDataPoint(name, newestPoint.value)
 		if (ok == 0) { condClass = "okValue"; }
@@ -305,13 +311,15 @@ function BuildHomePage()
 	//something with bmi
 	
 	document.getElementById('container').innerHTML = output;
-	document.getElementById('userNameSpan').innerHTML = userInfo.name+"'s ";
+	if (userInfo.name != '') {
+		document.getElementById('userNameSpan').innerHTML = userInfo.name+"'s ";
+	}
 }
 
 function ResetDefaultData()
 {
 	userData = testUserData;
-	userInfo = {name: '', height: 0, sex: ''};
+	userInfo = defaultUserInfo;
 	StoreData(userData, "userData");
 	StoreData(userInfo, "userInfo");
 	BuildHomePage();
@@ -320,7 +328,7 @@ function ResetDefaultData()
 function ClearAllData()
 {
 	userData = [];
-	userInfo = {name: '', height: 0, sex: ''};
+	userInfo = defaultUserInfo;
 	StoreData(userData, "userData");
 	StoreData(userInfo, "userInfo");
 	BuildHomePage();
