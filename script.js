@@ -12,8 +12,9 @@ var monthly = 60 * 60 * 24 * 30;
 
 
 testUserData = [
-{"type":"Blood Pressure (diastolic)","data":[{"date":1457297331940,"value":78},{"date":1457297330949,"value":83},{"date":1457486304867,"value":88}]},
-{"type":"Blood Pressure (systolic)","data":[{"date":1457297231840,"value":119},{"date":1457297230849,"value":108},{"date":1457486304867,"value":138}]},
+{"type":"Blood Pressure (diastolic)","data":[{"date":1457277331940,"value":78},{"date":1457297330949,"value":83},{"date":1457426304867,"value":88},{"date":1457486504867,"value":95}]},
+{"type":"Blood Pressure (systolic)","data":[{"date":1457277231840,"value":119},{"date":1457297230849,"value":108},{"date":1457426304867,"value":138},{"date":1457486507867,"value":131}]},
+{"type":"Cholesterol (Total)","data":[{"date":1457297231840,"value":197},{"date":1457297230849,"value":203},{"date":1457426304867,"value":215},{"date":1457486507867,"value":192}]},
 {"type":"Heart Rate","data":[{"date":1457177231912,"value":72},{"date":1457187131929,"value":66}]}];
 
 userData = [];
@@ -187,8 +188,10 @@ function AddData(typeName, value)
 	StoreData(userData, "userData");
 }
 
-function checkDataPoint(typeName, value)
+function getHealthyLimits(typeName)
 {
+	var max = 0;
+	var min = 0;
 	datatypes.forEach(function(item, ii) {
 		if (item.type == typeName) 
 		{
@@ -196,7 +199,12 @@ function checkDataPoint(typeName, value)
 			min = item.min;
 		}
 	});
-	
+	return [min, max]
+}
+
+function checkDataPoint(typeName, value)
+{
+	var [min, max] = getHealthyLimits(typeName);
 	if (value > max) {
 		return 1;
 	} else if (value < min) {
@@ -265,19 +273,21 @@ function BuildHomePage()
 		var age = getDataAge(item);
 		var unit = getUnit(item);
 		var newestPoint = getNewestPoint(item);
+		var name = item.type;
+		var [min, max] = getHealthyLimits(name);
 		var condClass = '';
-		var ok = checkDataPoint(item.type, newestPoint.value)
+		var ok = checkDataPoint(name, newestPoint.value)
 		if (ok == 0) { condClass = "okValue"; }
 		else { condClass = "badValue"; }
 		output += "<div class='dashDataLine " + style + "'>";
 		output += "<span class='dashDataName'>";
-		output += item.type + "</span>";
-		output += "<span class='dashDataValue "+condClass+"'>Current Value: "+newestPoint.value+" "+unit+"</span>";
-		output += "<span class='dashDataButton fakeLink' onclick='PromptForData(\""+item.type+"\")'>Add Data</span>"
-
-		output += "<span class='dashReportButton fakeLink' onclick='GenReport(\""+item.type+"\")'>Report</span>"
+		output += name + "</span>";
+		output += "<span class='dashDataValue "+condClass+"' title='Healthy range is: ("+min+" - "+max+")'>"
+		output += "Current Value: "+newestPoint.value+" "+unit+"</span>";
+		output += "<span class='dashDataButton fakeLink' onclick='PromptForData(\""+name+"\")'>Add Data</span>"
+		output += "<span class='dashReportButton fakeLink' onclick='GenReport(\""+name+"\")'>Report</span>"
 		output += "<span class='dashDataDate'>Last updated: " + age + "</span>";
-		output += "<span class='dashDeleteButton fakeLink' onclick='DeleteData(\""+item.type+"\")'>Delete</span>"
+		output += "<span class='dashDeleteButton fakeLink' onclick='DeleteData(\""+name+"\")'>Delete</span>"
 		
 		output += "</div>";
 		if (style == "oddLine") { style = "evenLine"; }
@@ -295,6 +305,7 @@ function BuildHomePage()
 	//something with bmi
 	
 	document.getElementById('container').innerHTML = output;
+	document.getElementById('userNameSpan').innerHTML = userInfo.name+"'s ";
 }
 
 function ResetDefaultData()
@@ -328,11 +339,10 @@ function addUserInfo()
 	userInfo.height = input;
 	
 	//input = '';
-	//while (!isNumeric(input)) {	
-	//	input = prompt("Enter Your Height (inches) ", '');
-	//}
-	//userInfo.height = input;
+	//input = prompt("Enter Your Name ", '');
+	//userInfo.sex = input;
 	StoreData(userInfo, "userInfo");
+	BuildHomePage();
 }
 
 function GenReport(typeName)
@@ -347,8 +357,20 @@ function GenReport(typeName)
 	thisSeries.data.forEach(function(item, ii) {
 		output += "<tr><td>"+formatDate(item.date)+"</td>";
 		output += "<td>"+formatTime(item.date)+"</td>";
-		output += "<td>"+item.value+"</td></tr>";
+		output += "<td class='"
+		if (!checkDataPoint(typeName, item.value)) 
+		{output += "okValue"; }
+		else { output += "badValue"; }
+		output += "'>"+item.value+"</td></tr>";
 		
 	});
+	output += "</tbody></table>";
+	output += "<span class='fakeLink' onclick='clearReport()'>Close Report</span>"
+	
 	document.getElementById('reportArea').innerHTML = output;
+}
+
+function clearReport()
+{
+	document.getElementById('reportArea').innerHTML = '';
 }
